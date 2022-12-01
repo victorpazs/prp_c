@@ -84,7 +84,7 @@ int mainMenu(){
      printf("[3] Meu saldo\n");
      printf("[4] Finalizar compra atual\n");
      printf("[5] Saiba mais sobre a Madeireira X\n");
-     printf("[0] Sair\n");
+     printf("[0] Sair");
      printf("\n------------------");
      printf("-------------------------");
      printf("-----------------\n\n");
@@ -95,31 +95,6 @@ int mainMenu(){
      return opt;
 }
 
-void VerMenu(){
-     int op = -1;
-
-     PrintMenu();
-     printf("\nO que deseja fazer?\n");
-     printf("\n[1] Comprar");
-     printf("\n[0] Voltar");
-     printf("\n\nOpção:");
-     scanf("%d", &op);
-
-     switch (op){
-        case 1:
-            system( "cls" );
-            addCarrinho();
-            break;
-        case 0:
-            system( "cls" );
-            return;
-
-        default:
-           printf("\nOpção invalida!\n\n");
-           return;
-
-    }
-}
 
 void PrintMenu(){
     int i;
@@ -135,23 +110,50 @@ void PrintMenu(){
 
 }
 
+void VerMenu(){
+     int op = -1;
 
-void addCarrinho(){
-    int op = -1, i;
-    printf("\nQual item deseja adicionar ao carrinho?\n");
-    PrintMenu();
-    printf("\n\n[0] - Voltar");
-    printf("\n\n=======================================");
-    printf("\n\nSua opção:");
-    scanf("%d", &op);
+     PrintMenu();
+     printf("\nO que deseja fazer?\n");
+     printf("\n[1] Adicionar item 1 ao carrinho");
+     printf("\n[2] Adicionar item 2 ao carrinho");
+     printf("\n[3] Adicionar item 3 ao carrinho");
+     printf("\n[4] Adicionar item 4 ao carrinho");
+     printf("\n\n[0] Voltar");
+     printf("\n\nOpção:");
+     scanf("%d", &op);
 
-    switch (op){
+     switch (op){
         case 1:
         case 2:
         case 3:
         case 4:
             system( "cls" );
-            addItemCarrinho(op - 1);
+            addCarrinho(op);
+            break;
+        case 0:
+            system( "cls" );
+            return;
+
+        default:
+           printf("\nOpção invalida!\n");
+           printf("Pressione ENTER para voltar ao menu!");
+           getchar();
+           return;
+
+    }
+}
+
+
+
+void addCarrinho(int opt){
+    switch (opt){
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+            system( "cls" );
+            addItemCarrinho(opt - 1);
             break;
         case 0:
             system( "cls" );
@@ -161,15 +163,13 @@ void addCarrinho(){
             printf("\nPressione qualquer tecla para voltar");
            getchar();
            return;
-
-
     }
 }
 void addItemCarrinho(int item){
     int quantidade = 0, total = 0, index;
 
 
-    printf("\nQuantos metros?");
+    printf("\nQuantos metros deseja comprar? ");
     scanf("%d", &quantidade);
 
     total = quantidade * menu_itens_preco[item];
@@ -179,7 +179,7 @@ void addItemCarrinho(int item){
             printf("\nImpossível adicionar, o carrinho está cheio\n");
     } else {
         if (IL == -1){ //there is no nodos on the list
-                IL = FL =  IA; //IL = 0 and FL = 0
+                IL = FL = IA; //IL = 0 and FL = 0
             } else if (FL < FA){ //has space at the beginning of the array
                 FL++; //FL = FL + 1
             }   else {
@@ -223,6 +223,7 @@ int x, opt = -1, valorTotal = 0;
         printf("\nValor total do carrinho: %d\n\n", valorTotal);
     } else{
         printf("\nCarrinho vazio");
+        printf("\nPressione ENTER para voltar ao menu");
         getchar();
         return;
     }
@@ -233,10 +234,10 @@ void menuCarrinho(){
     printCarrinho();
 
      if (IL != -1 && FL != -1){
-    printf("\n[1] Editar item");
-    printf("\n[2] Limpar carrinho");
-    printf("\n\n[0] Voltar");
-
+    printf("\n[1]Editar item");
+    printf("\t\t[2] Limpar carrinho (esvaziar)");
+    printf("\t\t[3] Finalizar compras");
+    printf("\t\t[0] Voltar");
     printf("\n\nO que deseja fazer agora?");
     scanf("%d", &opt);
     switch (opt){
@@ -246,6 +247,9 @@ void menuCarrinho(){
             break;
         case 2:
             limparCarrinho();
+            return;
+        case 3:
+            finalizarCompra();
             return;
         case 0:
             system( "cls" );
@@ -269,56 +273,18 @@ void editCarrinho(){
         getchar();
         return;
     } else {
-        printf("\n[1] - Editar quantidade");
-        printf("\n[2] - Excluir");
-        printf("\n\nOpção:");
-        scanf("%d", &opt);
-
-        if (opt == 1){
-            system( "cls" );
-            printf("\n\nQuantidade atual do %dº item: %d", item, carrinho[item - 1].quantidade);
-
-            printf("\n\nDigite a nova quantidade:");
-            scanf("%d", &newQuantidade);
-
-            newTotal = newQuantidade * carrinho[item - 1].valor;
-
-            carrinho[item - 1].total = newTotal;
-            carrinho[item - 1].quantidade = newQuantidade;
-
-            printf("\n\nNovo valor total do item: R$%d,00", newTotal);
-
-            printf("\nPressione qualquer tecla para voltar");
-
-            getchar();
-
-        } else if (opt == 2){
-            if(item - 1 < 0 || item - 1 > FL - IL +1 || item - 1 > FL){
-                printf("\nImpossível remover este item\n");
-                printf("\nPressione qualquer tecla para voltar");
-                getchar();
-            }
-            else {
-                for (index = IL + item - 1 - 1; index < FL - 1; index ++) {
-                    carrinho[index] = carrinho[index + 1];
-                    }
-                FL--;
-                if (FL == IL - 1){
-                    IL = FL = -1;
-                }
-
-                printf("\nItem removido do carrinho!\n");
-                getchar();
-                return;
-            }
-
-        } else {
-            printf("\n\nOpção inválida!");
-            getchar();
-            return;
-
-        }
+        system( "cls" );
+        printf("\n\nQuantidade atual do %dº item: %d", item, carrinho[item - 1].quantidade);
+        printf("\n\nDigite a nova quantidade:");
+        scanf("%d", &newQuantidade);
+        newTotal = newQuantidade * carrinho[item - 1].valor;
+        carrinho[item - 1].total = newTotal;
+        carrinho[item - 1].quantidade = newQuantidade;
+        printf("\n\nNovo valor total do item: R$%d,00", newTotal);
+        printf("\nPressione ENTER para voltar");
+        getchar();
     }
+
 
 }
 
@@ -328,7 +294,7 @@ void verCarteira(){
     system("color 0A");
     printf("\nSALDO ATUAL: RS%d,00", saldoConta);
     printf("\n\n[1] Adicionar saldo");
-    printf("\n[0] Voltar");
+    printf("\t[0] Voltar");
     printf("\n\nOpção: ");
     scanf("%d", &opt);
     if (opt == 1){
@@ -422,6 +388,5 @@ void finalizarCompra(){
 
     }
 }
-
 
 
