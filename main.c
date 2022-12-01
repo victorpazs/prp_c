@@ -53,6 +53,9 @@ int main()
             case 3: // Meu saldo, mostra ao usuario o seu saldo para comprar
                 verCarteira();
                 break;
+            case 4:
+                finalizarCompra();
+                break;
             case 5: // info do app
                 infoApp();
                 break;
@@ -205,7 +208,7 @@ void addItemCarrinho(int item){
 }
 
 void printCarrinho(){
-int x, opt = -1;
+int x, opt = -1, valorTotal = 0;
 
     if (IL != -1 && FL != -1){
         for (index = IL; index <= FL; index ++){
@@ -215,7 +218,9 @@ int x, opt = -1;
             printf("\nValor do produto: %d", carrinho[index].valor);
             printf("\nValor total: %d", carrinho[index].total);
             printf("\n=======================================\n");
+            valorTotal = valorTotal + carrinho[index].total;
         }
+        printf("\nValor total do carrinho: %d\n\n", valorTotal);
     } else{
         printf("\nCarrinho vazio");
         getchar();
@@ -281,7 +286,7 @@ void editCarrinho(){
             carrinho[item - 1].total = newTotal;
             carrinho[item - 1].quantidade = newQuantidade;
 
-            printf("\n\nNovo valor total do item:", carrinho[item - 1].total);
+            printf("\n\nNovo valor total do item: R$%d,00", newTotal);
 
             printf("\nPressione qualquer tecla para voltar");
 
@@ -367,3 +372,56 @@ getchar();       // parada da tela
 void limparCarrinho(){
     IL = FL = IA -1;
 }
+ int valorTotalCarrinho(){
+    int valorTotal = 0;
+
+     if (IL != -1 && FL != -1){
+        for (index = IL; index <= FL; index ++){
+            valorTotal = valorTotal + carrinho[index].total;
+        }
+    } else valorTotal = 0;
+
+    return valorTotal;
+
+ }
+void finalizarCompra(){
+    int opt = -1, totalCarrinho = 0;
+    system("color 0A");
+    totalCarrinho = valorTotalCarrinho();
+    system( "cls" );
+    if (IL != -1 && FL != -1){
+        printf("Valor total do carrinho: %d", totalCarrinho);
+        printf("\n\nSaldo da carteira: %d", saldoConta);
+
+        printf("\n\nTem certeza que deseja finalizar as compras?");
+        printf("\n\n[1] Sim \t");
+        printf("[0] Não");
+        printf("\n\nOpção:");
+        scanf("%d", &opt);
+
+        if (opt == 1){
+            if (totalCarrinho > saldoConta){
+                printf("\nImpossível finalizar a compra, o seu saldo é insuficiente!");
+                printf("\n\nPressione enter para voltar ao menu!");
+                getchar();
+            } else {
+                saldoConta = saldoConta - totalCarrinho;
+                limparCarrinho();
+                printf("\nCompra finalizada! Pressione enter para voltar ao menu!");
+                getchar();
+                return;
+            }
+        } else {
+            return;
+        }
+        } else {
+            printf("\nNão há o que finalizar, o carrinho está vazio!");
+            printf("\nPressione Enter para voltar ao menu!");
+            getchar();
+            return;
+
+    }
+}
+
+
+
