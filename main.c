@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <math.h>
 #include <locale.h>
+#include<conio.h>
+#define ANSI_COLOR_GREEN  "\u001b[32m" //cores em ANSI utilizadas
 
 //Funcoes
 int mainMenu(); // funcao de retorno que volta a opcao do menu inicial
@@ -9,8 +11,11 @@ void VerMenu(); // funcao que mostra o catalogo ao cliente
 void addCarrinho();  // funcao mostra as opções do catálogo e pergunta qual o cliente quer utilizar, alem
 void PrintMenu(); //funcao que mostra os itens do menu
 void informaItem(); // pede ao usuário o item que deseja adicionar e a quantidade, depois adiciona o mesmo na lista;
-int tamanhoCarrinho(); // funcao que retorna o tamanho do carrinho
-void verCarrinho(); //mostra o carrinho atual do cliente
+void menuCarrinho(); //abre o menu geral do carrinho
+void printCarrinho(); //mostra o carrinho atual do cliente
+void limparCarrinho(); //limpa o carrinho do usuário;
+void verCarteira(); //mostra o saldo atual do usuário
+void infoApp();
 
 //Menu de itens
 char menu_itens[4][50] = {"Madeira A","Madeira AB","Madeira B","Madeira C"};
@@ -18,51 +23,56 @@ char menu_itens_descricao[4][1000] = {"Madeira lisa, sem nó, sem casca e sem re
 float menu_itens_preco[4] = {50.00,45.00,40.00,30.00};
 
 
+//variaveis para a lista do carrinho
+int index, IA=0, FA=24,IL, FL;
+
+
 typedef struct {
-    char nome_produto[200];
-    int valor, quantidade, total;
+    int valor, quantidade, total, id_item;
 } itemCarrinho;
 
-itemCarrinho carrinho[100];
+itemCarrinho carrinho[25];
 
 int saldoConta = 0;
 int main()
 {
+    IL = FL = IA -1;
+
     setlocale(LC_ALL, "Portuguese");          // alterar idioma para portugu�s
 
     int op = -1;
-
     while( op != 0 ){
         op = mainMenu();
-        system( "cls" );
          switch( op ) {
             case 1: // Ver menu (catalogo de itens)
                 VerMenu();
                 break;
             case 2: // Ver carrinho, da a possibilidade de editar algum item e gerenciar
-                verCarrinho();
+                menuCarrinho();
                 break;
-
-
-            case 4: // Meu saldo, mostra ao usuario o seu saldo para comprar
-                    break;
-
+            case 3: // Meu saldo, mostra ao usuario o seu saldo para comprar
+                verCarteira();
+                break;
             case 5: // info do app
-                    break;
+                infoApp();
+                break;
         case 0: // saida do programa
                 printf( "\n entrou [0] Para sair do programa" );
                 exit(0);
         default:
-                printf( "\n Digite uma Opcao Valida!" );
+                printf( "\nDigite uma Opcao Valida!" );
                 break;
         }
         getchar();       // parada da tela
+        fflush(stdin);
     }
 
 }
 
 int mainMenu(){
-    int opt = -1;
+     system("color 0f");
+     system( "cls" );
+     int opt = -1;
      printf("\n------------------");
      printf("Bem-vindo à Madeireira X!");
      printf("-----------------\n");
@@ -78,6 +88,7 @@ int mainMenu(){
      printf("Digite qual opcao que deseja seguir: ");
      fflush( stdin );   // limpa buffer do teclado, funciona antes da entrada de dados
      scanf( "%d", &opt );// tecla de opcao do menu
+     system( "cls" );
      return opt;
 }
 
@@ -87,7 +98,7 @@ void VerMenu(){
      PrintMenu();
      printf("\nO que deseja fazer?\n");
      printf("\n[1] Comprar");
-     printf("\n[2] Voltar");
+     printf("\n[0] Voltar");
      printf("\n\nOpção:");
      scanf("%d", &op);
 
@@ -96,14 +107,13 @@ void VerMenu(){
             system( "cls" );
             addCarrinho();
             break;
-        case 2:
+        case 0:
             system( "cls" );
-            mainMenu();
-            break;
+            return;
+
         default:
-            system( "cls" );
-            mainMenu();
-            break;
+           printf("\nOpção invalida!\n\n");
+           return;
 
     }
 }
@@ -111,12 +121,12 @@ void VerMenu(){
 void PrintMenu(){
     int i;
      printf("\n--------------------");
-     printf("Nossos produtos (preço por metro)");
+     printf(" Nossos produtos (preço por metro) ");
      printf("--------------------\n");
      for (i=0; i<4; i++){
         printf("[%i] R$%.2f - %s \n", i + 1, menu_itens_preco[i], menu_itens[i]);
      }
-     for (i=0; i<60; i++){
+     for (i=0; i<=75; i++){
         printf("-");
      }
 
@@ -124,10 +134,11 @@ void PrintMenu(){
 
 
 void addCarrinho(){
-    int op = -1;
-    printf("\nQual item deseja adicionar ao carrinho?\n\n");
+    int op = -1, i;
+    printf("\nQual item deseja adicionar ao carrinho?\n");
     PrintMenu();
-    printf("\n[0] - Voltar");
+    printf("\n\n[0] - Voltar");
+    printf("\n\n=======================================");
     printf("\n\nSua opção:");
     scanf("%d", &op);
 
@@ -141,74 +152,218 @@ void addCarrinho(){
             break;
         case 0:
             system( "cls" );
-            mainMenu();
-            break;
+            return;
         default:
-            system( "cls" );
-            mainMenu();
-            break;
+           printf("\nOpção invalida!\n\n");
+            printf("\nPressione qualquer tecla para voltar");
+           getchar();
+           return;
+
 
     }
 }
 void addItemCarrinho(int item){
-    int quantidade = 0, tamanho = 0, total = 0, valor = 0;
-    char nome[100];
+    int quantidade = 0, total = 0, index;
+
+
     printf("\nQuantos metros?");
     scanf("%d", &quantidade);
 
-    valor = menu_itens_preco[item];
-    nome[100] = menu_itens[item];
-    total = quantidade * valor;
-    if (quantidade > 0){
-    tamanho = tamanhoCarrinho();
-
-    carrinho[tamanho + 1].quantidade = quantidade;
-    carrinho[tamanho + 1].nome_produto[100] = nome;
-    carrinho[tamanho + 1].valor = valor;
-    carrinho[tamanho + 1].total = quantidade;
+    total = quantidade * menu_itens_preco[item];
 
 
-    printf("\n\nItem adicionado ao carrinho:");
-    printf("\n[%i] R$%.2f - %s - %d metros\n", item + 1, menu_itens_preco[item], menu_itens[item], quantidade);
+    if(IA == IL && FA == FL){ //full array
+            printf("\nImpossível adicionar, o carrinho está cheio\n");
     } else {
-        printf("\nQuantidade inválida!");
-        mainMenu();
+        if (IL == -1){ //there is no nodos on the list
+                IL = FL =  IA; //IL = 0 and FL = 0
+            } else if (FL < FA){ //has space at the beginning of the array
+                FL++; //FL = FL + 1
+            }   else {
+                    for (index = IL; index <= FL; index ++){
+                        carrinho[index - 1] = carrinho[index];
+                    }
+                IL--;
+            }
+
+    if (quantidade > 0){
+        carrinho[FL].quantidade = quantidade;
+        carrinho[FL].valor = menu_itens_preco[item];
+        carrinho[FL].total = total;
+        carrinho[FL].id_item = item;
+
+
+        printf("\n\nItem adicionado ao carrinho:");
+        printf("\n\n[%i] R$%.2f - %s - %d metros\n", item + 1, menu_itens_preco[item], menu_itens[item], quantidade);
+        } else {
+            printf("\nQuantidade inválida!");
+            return;
+        }
+        printf("\nPressione qualquer tecla para voltar");
+        getchar();
     }
 }
 
+void printCarrinho(){
+int x, opt = -1;
 
-int tamanhoCarrinho(){
-    int arr_len = *(&carrinho + 1) - carrinho;
-    return arr_len;
-}
-
-void verCarrinho(){
-    int x, tamanho = tamanhoCarrinho(), opt = -1;
-
-    printf("%d", tamanho);
-   /* if (tamanho > 0){
-    for (x= 0; x < tamanho; x++){
-        printf("\n===============");
-        printf("\nItem: %s", carrinho[x].nome_produto);
-        printf("\nQuantidade: %d", carrinho[x].quantidade);
-        printf("\nValor do produto: %d", carrinho[x].valor);
-        printf("\nValor total: %d", carrinho[x].total);
+    if (IL != -1 && FL != -1){
+        for (index = IL; index <= FL; index ++){
+            printf("\n============= %d° item ================", index + 1);
+            printf("\nItem: %s", menu_itens[carrinho[index].id_item]);
+            printf("\nQuantidade: %d", carrinho[index].quantidade);
+            printf("\nValor do produto: %d", carrinho[index].valor);
+            printf("\nValor total: %d", carrinho[index].total);
+            printf("\n=======================================\n");
+        }
+    } else{
+        printf("\nCarrinho vazio");
+        getchar();
+        return;
     }
-    } else printf("\nCarrinho vazio");
-    printf("\n\nDigite 0 para voltar ao menu:");
+
+}
+void menuCarrinho(){
+    int opt = -1;
+    printCarrinho();
+
+     if (IL != -1 && FL != -1){
+    printf("\n[1] Editar item");
+    printf("\n[2] Limpar carrinho");
+    printf("\n\n[0] Voltar");
+
+    printf("\n\nO que deseja fazer agora?");
     scanf("%d", &opt);
-
-
     switch (opt){
+        case 1:
+            system( "cls" );
+            editCarrinho();
+            break;
+        case 2:
+            limparCarrinho();
+            return;
         case 0:
             system( "cls" );
-            mainMenu();
-            break;
+            return;
         default:
             system( "cls" );
-            mainMenu();
-            break;
+            return;
     }
-*/
+    }
 }
 
+void editCarrinho(){
+    int opt = -1, item, newQuantidade = 0, newTotal = 0;
+    printCarrinho();
+    printf("\n\nQual dos itens você deseja editar?");
+    scanf("%d", &item);
+
+
+    if (item - 1 > FL){
+        printf("\nOpção invalida!");
+        getchar();
+        return;
+    } else {
+        printf("\n[1] - Editar quantidade");
+        printf("\n[2] - Excluir");
+        printf("\n\nOpção:");
+        scanf("%d", &opt);
+
+        if (opt == 1){
+            system( "cls" );
+            printf("\n\nQuantidade atual do %dº item: %d", item, carrinho[item - 1].quantidade);
+
+            printf("\n\nDigite a nova quantidade:");
+            scanf("%d", &newQuantidade);
+
+            newTotal = newQuantidade * carrinho[item - 1].valor;
+
+            carrinho[item - 1].total = newTotal;
+            carrinho[item - 1].quantidade = newQuantidade;
+
+            printf("\n\nNovo valor total do item:", carrinho[item - 1].total);
+
+            printf("\nPressione qualquer tecla para voltar");
+
+            getchar();
+
+        } else if (opt == 2){
+            if(item - 1 < 0 || item - 1 > FL - IL +1 || item - 1 > FL){
+                printf("\nImpossível remover este item\n");
+                printf("\nPressione qualquer tecla para voltar");
+                getchar();
+            }
+            else {
+                for (index = IL + item - 1 - 1; index < FL - 1; index ++) {
+                    carrinho[index] = carrinho[index + 1];
+                    }
+                FL--;
+                if (FL == IL - 1){
+                    IL = FL = -1;
+                }
+
+                printf("\nItem removido do carrinho!\n");
+                getchar();
+                return;
+            }
+
+        } else {
+            printf("\n\nOpção inválida!");
+            getchar();
+            return;
+
+        }
+    }
+
+}
+
+
+void verCarteira(){
+    int opt = -1;
+    system("color 0A");
+    printf("\nSALDO ATUAL: RS%d,00", saldoConta);
+    printf("\n\n[1] Adicionar saldo");
+    printf("\n[0] Voltar");
+    printf("\n\nOpção: ");
+    scanf("%d", &opt);
+    if (opt == 1){
+        addSaldo();
+    } else return;
+
+
+}
+
+void addSaldo(){
+    int valorAdd;
+    system("color 0A");
+    printf("\nQual quantia deseja adicionar?");
+    scanf("%d", &valorAdd);
+
+    if (valorAdd > 0){
+        saldoConta = saldoConta + valorAdd;
+        printf("\n\nSaldo adicionado com sucesso!");
+        printf("\nPressione enter para voltar ao menu!");
+        getchar();
+    } else {
+        printf("\n\nSaldo inválido!");
+        printf("\nPressione enter para voltar ao menu!");
+        getchar();
+    }
+
+}
+
+void infoApp(){
+    printf("A madeireira X tem o prazer de atender o cliente! \n\nAgora para facilitar nossas negociações trouxemos o novo sistema de venda da nossa Loja.");
+    printf("\nAqui voçe pode fazer de forma rapida ");
+    printf("e facil seus proprios orçamentos. Basta seguir nosso menu, selecionar a madeira desejada e a metragem");
+    printf("\nentão nosso software automaticamente calculara o valor final.");
+    printf("\n\nTemos a imensa satisfação de atendelo! \n NOTAS: \n ");
+    printf("este é um sistema criado por estudantes do curso de Ciencia da computação da Unisc.\nVictor Paz, Eduardo Sehn, Amanaury Pavanatto e Marcio Henrique \n");
+
+getchar();       // parada da tela
+
+}
+
+void limparCarrinho(){
+    IL = FL = IA -1;
+}
