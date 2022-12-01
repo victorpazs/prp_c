@@ -7,15 +7,16 @@
 
 //Funcoes
 int mainMenu(); // funcao de retorno que volta a opcao do menu inicial
-void VerMenu(); // funcao que mostra o catalogo ao cliente
+void menuCompra(); // funcao que mostra o catalogo ao cliente
 void addCarrinho();  // funcao mostra as opções do catálogo e pergunta qual o cliente quer utilizar, alem
-void PrintMenu(); //funcao que mostra os itens do menu
+void printMenuItems(); //funcao que mostra os itens do menu
 void informaItem(); // pede ao usuário o item que deseja adicionar e a quantidade, depois adiciona o mesmo na lista;
 void menuCarrinho(); //abre o menu geral do carrinho
 void printCarrinho(); //mostra o carrinho atual do cliente
 void limparCarrinho(); //limpa o carrinho do usuário;
 void verCarteira(); //mostra o saldo atual do usuário
-void infoApp();
+void addSaldo(); // adiciona saldo à carteira;
+void infoApp(); //printa as informações do app
 
 //Menu de itens
 char menu_itens[4][50] = {"Madeira A","Madeira AB","Madeira B","Madeira C"};
@@ -45,7 +46,7 @@ int main()
         op = mainMenu();
          switch( op ) {
             case 1: // Ver menu (catalogo de itens)
-                VerMenu();
+                menuCompra();
                 break;
             case 2: // Ver carrinho, da a possibilidade de editar algum item e gerenciar
                 menuCarrinho();
@@ -60,10 +61,10 @@ int main()
                 infoApp();
                 break;
         case 0: // saida do programa
-                printf( "\n entrou [0] Para sair do programa" );
+                printf( "\nObrigado por comprar conosco!\n\n");
                 exit(0);
         default:
-                printf( "\nDigite uma Opcao Valida!" );
+                printf("\nDigite uma Opcao Valida!");
                 break;
         }
         getchar();       // parada da tela
@@ -96,7 +97,7 @@ int mainMenu(){
 }
 
 
-void PrintMenu(){
+void printMenuItems(){
     int i;
      printf("\n--------------------");
      printf(" Nossos produtos (preço por metro) ");
@@ -110,10 +111,10 @@ void PrintMenu(){
 
 }
 
-void VerMenu(){
+void menuCompra(){
      int op = -1;
 
-     PrintMenu();
+     printMenuItems();
      printf("\nO que deseja fazer?\n");
      printf("\n[1] Adicionar item 1 ao carrinho");
      printf("\n[2] Adicionar item 2 ao carrinho");
