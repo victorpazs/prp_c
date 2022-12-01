@@ -1,0 +1,7 @@
+# depslib dependency file v1.0
+1669305497 source:c:\users\v2020\desktop\aaaaa\main.c
+	<stdio.h>
+	<stdlib.h>
+	<math.h>
+	<locale.h>
+
